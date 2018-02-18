@@ -1,0 +1,58 @@
+<?xml version="1.0" ?> 
+<project name="AntExample1" default="tomcat.start">
+<property file="tomcatdeploy.properties"/>
+
+<property name="deploy.url" value="${manager.url}"/>
+<property name="deploy.user" value="${manager.username}"/>
+<property name="deploy.pass" value="${manager.password}"/>
+<property name="deploy.context" value="/AntExample"/>
+
+<taskdef name="start" classname="org.apache.catalina.ant.StartTask" />
+<taskdef name="stop" classname="org.apache.catalina.ant.StopTask" />
+<taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" />
+<taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" />
+
+	<path id="compile.classpath">
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	<target name="clean">
+		<delete dir="dist" />
+		<delete dir="build" />
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="build/classes"/>
+		<mkdir dir="dist" />
+	</target>
+	
+	<target name="compile" depends="init" >
+		<javac destdir="build/classes" debug="true" srcdir="src">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="war" depends="compile">
+		<war destfile="dist/AntExample.war" webxml="WebContent/WEB-INF/web.xml">
+			<fileset dir="WebContent"/>
+			<lib dir="WebContent/WEB-INF/lib"/>
+			<classes dir="build/classes"/>
+		</war>
+	</target>
+		
+<target name="tomcat.undeploy" depends="tomcat.stop">
+  <undeploy url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+</target>
+<target name="tomcat.deploy" depends="tomcat.undeploy" >
+  <deploy url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}" war="dist/AntExample.war"/>
+</target>
+<target name="tomcat.stop" depends="war">
+  <stop url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+</target>
+
+<target name="tomcat.start" depends="tomcat.deploy">
+  <start url="${deploy.url}" failOnError="false" username="${deploy.user}" password="${deploy.pass}" path="${deploy.context}"/>
+</target>
+	
+</project>
