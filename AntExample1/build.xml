@@ -1,5 +1,5 @@
 <?xml version="1.0" ?> 
-<project name="AntExample1" default="compile">
+<project name="AntExample1" default="tomcat.start">
 <property file="tomcatdeploy.properties"/>
 
 <property name="deploy.url" value="${manager.url}"/>
